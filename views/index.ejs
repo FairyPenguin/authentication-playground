@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      body {
+        height: 100dvb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      main,
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        width: fit-content;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <sextion>
+        <h1>Welcome, <%= name %></h1>
+      </sextion>
+      <sextion>
+        <main>
+          <form action="/profile" method="post">
+            <input
+              type="text"
+              name="name"
+              placeholder="your-name"
+              autocomplete="off"
+            />
+            <!-- <input type="text" /> -->
+            <button>SUBMIT @@</button>
+          </form>
+
+          <form action="/logout" method="post">
+            <button>LogOut @@</button>
+          </form>
+        </main>
+      </sextion>
+    </main>
+  </body>
+</html>
