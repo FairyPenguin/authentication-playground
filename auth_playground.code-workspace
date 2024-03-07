@@ -1,8 +1,13 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../../HTML_CSS/3bata"
+    }
+  ],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "3bata"
+  }
 }

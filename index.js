@@ -3,8 +3,6 @@ import session from "express-session"
 import cookieParser from "cookie-parser"
 import { fileURLToPath } from "url"
 import path from "path"
-import { PrismaClient } from '@prisma/client'
-import { PrismaSessionStore } from "@quixo3/prisma-session-store"
 
 // import { prisma } from "./database.js"
 
@@ -12,7 +10,6 @@ const app = express()
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 
-const prisma = new PrismaClient()
 
 app.use(session({
     secret: "Session String",
@@ -35,9 +32,17 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 
-async function main() {
+// async function main() {
 
-}
+//     const newUser = await prisma.user.create({
+//         data: {
+//             name: "newUserFromNodejs",
+//             email: "newUserFromNodejs@gmail.com"
+//         },
+//     })
+
+//     console.log(newUser)
+// }
 
 // app.use(express.static("public"))
 app.use(express.urlencoded({ extended: false }));
@@ -82,14 +87,14 @@ app.post("/logout", (req, res) => {
 })
 
 
-main().then(async () => {
-    await prisma.$disconnect()
+// main().then(async () => {
+//     await prisma.$disconnect()
 
-}).catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-})
+// }).catch(async (e) => {
+//     console.error(e)
+//     await prisma.$disconnect()
+//     process.exit(1)
+// })
 
 
 app.listen(8080)
