@@ -3,27 +3,51 @@ import session from "express-session"
 import cookieParser from "cookie-parser"
 import { fileURLToPath } from "url"
 import path from "path"
+import createNewUser from "./utilites/createNewUser.js";
+import { loginCheck } from "./utilites/LoginCheck.js"
+import process from "process"
+import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import { PrismaClient } from '@prisma/client';
 
-// import { prisma } from "./database.js"
+
+
 
 const app = express()
 app.use(express.urlencoded({ extended: false }))
-app.use(cookieParser())
+// app.use(cookieParser())
 
+const cookiesSecret = process.env.COOKIES_SESSION_SECRET
 
-app.use(session({
-    secret: "Session String",
-    cookie: {},
-    resave: false,
-    saveUninitialized: false,
-    store: new PrismaSessionStore(prisma,
-        {
-            checkPeriod: 2 * 60 * 1000,
-            dbRecordIdIsSessionId: true,
-            dbRecordIdFunction: undefined
-        }
-    )
-}))
+// const authMiddleware = app.use(session({
+//     secret: cookiesSecret,
+//     cookie: {
+//         httpOnly: true,
+//         maxAge: 6000 // in ms => equal to 5 mins || 1 min = 12000 ms
+//     },
+//     resave: false,
+//     saveUninitialized: false,
+//     store: {}
+// }))
+
+const authMiddleware =
+    session({
+
+        secret: cookiesSecret,
+        cookie: {
+            // maxAge: 7 * 24 * 60 * 60 * 1000 // ms
+        },
+        resave: false,
+        saveUninitialized: false,
+        store: new PrismaSessionStore(
+            new PrismaClient(),
+            {
+                // checkPeriod: 2 * 60 * 1000,  //ms
+                dbRecordIdIsSessionId: true,
+                dbRecordIdFunction: undefined,
+            }
+        )
+    })
+
 
 app.set("view engine", "ejs")
 app.set("views", "./views")
@@ -32,31 +56,15 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 
-// async function main() {
-
-//     const newUser = await prisma.user.create({
-//         data: {
-//             name: "newUserFromNodejs",
-//             email: "newUserFromNodejs@gmail.com"
-//         },
-//     })
-
-//     console.log(newUser)
-// }
-
-// app.use(express.static("public"))
-app.use(express.urlencoded({ extended: false }));
+let name = "Guest User"
 
 app.get("/", (req, res) => {
-    console.log(req.cookies)
-
-    let name = "Guest User"
+    // console.log(req.cookies)
 
 
-
-    if (req.session.user) {
-        name = req.session.user
-    }
+    // if (req.session.user) {
+    //     name = req.session.user
+    // }
 
     // res.cookie("myCookie", "Cookie_Monster",
     //     {
@@ -65,12 +73,59 @@ app.get("/", (req, res) => {
     //         maxAge: 12000
     //     })
 
-    // res.sendFile(__dirname + "/views/index.html");
     // res.json("Looking at the ⭐️⭐️⭐️⭐️")
     res.render("index", { name })
 
 })
 
+
+app.post("/login", async (req, res) => {
+
+    const userName = req.body.name
+
+    const checkUser = await loginCheck(userName)
+
+    if (checkUser === null) {
+        return res.status(422).json({ error: "Incorrect username" })
+    }
+
+    // res.cookie()
+
+    name = checkUser?.username
+
+    res.redirect("/profile")
+
+})
+
+app.post("/register", authMiddleware, async (req, res) => {
+
+    const userName = req.body.name
+
+    const newUser = await createNewUser(userName)
+
+    req.session.userName = req.body.name
+
+    res.status(200).send({ newUser })
+
+    // req.session.regenerate((err) => {
+    //     if (err) {
+    //         console.error("Error regenerating session", err);
+    //         return res.status(500).send("Internal Server Error")
+    //     }
+
+
+    //     req.session.userName = req.body.name
+
+    //     res.status(200).send({ newUser })
+
+    // })
+
+})
+
+
+app.get("/profile", (req, res) => {
+    res.render("profile", { name })
+})
 
 app.post("/profile", (req, res) => {
 
@@ -81,20 +136,16 @@ app.post("/profile", (req, res) => {
 })
 
 app.post("/logout", (req, res) => {
+
+    name = "Guest User"
     req.session.destroy(err => {
         res.redirect("/")
     })
 })
 
 
-// main().then(async () => {
-//     await prisma.$disconnect()
-
-// }).catch(async (e) => {
-//     console.error(e)
-//     await prisma.$disconnect()
-//     process.exit(1)
-// })
 
 
+
+console.log(process.memoryUsage());
 app.listen(8080)

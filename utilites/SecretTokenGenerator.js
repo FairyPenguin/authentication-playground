@@ -2,7 +2,7 @@ import crypto from "crypto"
 
 function generateSecretToken() {
 
-    const secretToken = crypto.randomBytes(32).toString("hex")
+    const secretToken = crypto.randomBytes(256).toString("hex")
 
     return secretToken
 

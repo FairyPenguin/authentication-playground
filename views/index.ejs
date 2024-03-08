@@ -12,7 +12,19 @@
         justify-content: center;
         align-items: center;
       }
-      main,
+      main {
+        text-align: center;
+        display: flex;
+        column-gap: 1rem;
+        flex-direction: column;
+      }
+
+      .forms {
+        display: flex;
+        /* flex-direction: row; */
+        column-gap: 1rem;
+      }
+
       form {
         display: flex;
         flex-direction: column;
@@ -21,45 +33,52 @@
         justify-content: center;
         align-items: center;
       }
+
+      form input {
+        height: 2rem;
+        font-size: 1.5rem;
+      }
+
+      button {
+        font-size: 1rem;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <main>
-      <sextion>
+      <section>
         <h1>Welcome, <%= name %></h1>
-      </sextion>
-      <sextion>
-        <main>
+      </section>
+      <section class="forms">
+        <form action="/register" method="post">
           <h2>Register</h2>
-          <form action="/registerme" method="post">
-            <input
-              type="text"
-              name="name"
-              placeholder="your-name"
-              autocomplete="off"
-            />
-            <!-- <input type="text" /> -->
-            <button>SUBMIT @@</button>
-          </form>
+          <input
+            type="text"
+            name="name"
+            placeholder="your-name"
+            autocomplete="off"
+          />
+          <!-- <input type="text" /> -->
+          <button>Register @@</button>
+        </form>
 
+        <form action="/login" method="post">
           <h2>Login</h2>
+          <input
+            type="text"
+            name="name"
+            placeholder="username"
+            autocomplete="off"
+          />
+          <!-- <input type="text" /> -->
+          <button>Login @</button>
+        </form>
 
-          <form action="/login" method="post">
-            <input
-              type="text"
-              name="name"
-              placeholder="username"
-              autocomplete="off"
-            />
-            <!-- <input type="text" /> -->
-            <button>SUBMIT @</button>
-          </form>
-
-          <!-- <form action="/logout" method="post">
+        <!-- <form action="/logout" method="post">
             <button>LogOut @@</button>
           </form> -->
-        </main>
-      </sextion>
+      </section>
     </main>
   </body>
 </html>
