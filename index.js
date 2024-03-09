@@ -97,28 +97,23 @@ app.post("/login", async (req, res) => {
 
 })
 
+
+
 app.post("/register", authMiddleware, async (req, res) => {
 
     const userName = req.body.name
 
-    const newUser = await createNewUser(userName)
+    try {
+        const newUser = await createNewUser(userName)
 
-    req.session.userName = req.body.name
+        req.session.userName = req.body.name
 
-    res.status(200).send({ newUser })
+        res.status(200).json({ newUser })
 
-    // req.session.regenerate((err) => {
-    //     if (err) {
-    //         console.error("Error regenerating session", err);
-    //         return res.status(500).send("Internal Server Error")
-    //     }
+    } catch (error) {
 
-
-    //     req.session.userName = req.body.name
-
-    //     res.status(200).send({ newUser })
-
-    // })
+        res.status(409).json({ error: error.message })
+    }
 
 })
 
@@ -129,18 +124,36 @@ app.get("/profile", (req, res) => {
 
 app.post("/profile", (req, res) => {
 
-    req.session.user = req.body.name.trim()
+    // req.session.user = req.body.name.trim()
 
     res.send(`<h2>Thanks, Go to your mother <a href="/">Mom</a></h>`)
 
 })
 
-app.post("/logout", (req, res) => {
+app.post("/logout", authMiddleware, (req, res) => {
 
     name = "Guest User"
+
+
     req.session.destroy(err => {
-        res.redirect("/")
+
+        if (err) {
+
+            console.error(err);
+
+        } else {
+
+            res.clearCookie("user")
+
+            res.cookie("user", "", { expires: new Date(0) })
+
+            res.redirect("/")
+
+        }
     })
+
+
+
 })
 
 
