@@ -8,25 +8,27 @@ import { loginCheck } from "./utilites/LoginCheck.js"
 import process from "process"
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
-
+import { styleText } from "util"
 
 
 
 const app = express()
+
+const PORT = process.env.PORT || 8080
+
 app.use(express.urlencoded({ extended: false }))
 // app.use(cookieParser())
 
 const cookiesSecret = process.env.COOKIES_SESSION_SECRET
 
-// const authMiddleware = app.use(session({
-//     secret: cookiesSecret,
-//     cookie: {
-//         httpOnly: true,
-//         maxAge: 6000 // in ms => equal to 5 mins || 1 min = 12000 ms
-//     },
-//     resave: false,
-//     saveUninitialized: false,
-//     store: {}
+
+const styled = styleText("bgYellowBright", styleText("black", "__The Start of the colored logs__"))
+
+console.log(styled);
+
+// console.log(process.env);
+
+store: { }
 // }))
 
 const authMiddleware =
@@ -152,13 +154,36 @@ app.post("/logout", authMiddleware, (req, res) => {
         }
     })
 
-
-
 })
 
 
+app.get("/users", (req, res) => {
+
+    // const query = req.query
+
+    const key = req.query.key
+    const value = req.query.value
+
+    // const { query: { key } } = req
+
+    console.log(key);
+
+    res.send({ key })
+
+})
+
+// console.log(process.memoryUsage());
+
+app.listen(PORT, () => {
 
 
+    console.log(`Running on port: ${styleText("magenta", styleText("bold", `${PORT}`))} `)
 
-console.log(process.memoryUsage());
-app.listen(8080)
+
+    console.log(`Open ${styleText("yellowBright", styleText("bold", `http://localhost:${PORT}`)
+    )} in your browser
+    `);
+
+    // console.log(styleText("bgYellowBright",
+    //     styleText("black", `Open http://localhost:${port} in your browser`)));
+})

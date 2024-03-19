@@ -8,6 +8,7 @@ import getUsers from "./utilites/getUsers.js"
 import createNewUser from "./utilites/createNewUser.js"
 import login from "./utilites/login.js";
 import authMiddleware from "./utilites/AuthMidlleware.js"
+import { styleText } from "util"
 
 
 
@@ -36,7 +37,7 @@ app.get("/", (req, res) => {
 
 
 
-app.post("/registerme", (req, res) => {
+app.post("/register", (req, res) => {
 
     const userName = req.body.name
 
@@ -60,6 +61,10 @@ app.post("/registerme", (req, res) => {
 app.post("/login", async (req, res) => {
 
     const userName = req.body.name
+
+    if (!userName) {
+        return res.status(442).json({ error: "no username" })
+    }
 
     const user = await login(userName)
 
@@ -88,9 +93,24 @@ app.get("/users", async (req, res) => {
 
 app.post("/users", authMiddleware, async (req, res) => {
 
-    const users = await getUsers()
+    // const users = await getUsers()
 
-    res.json(users)
+    // res.json(users)
+
+    console.log(req.body);
+    console.log(req.headers);
+
+
+    try {
+
+        const users = await getUsers();
+        res.json(users);
+
+    } catch (err) {
+
+        res.sendStatus(500).json("Invalid Token");
+
+    }
 
 })
 
@@ -117,10 +137,18 @@ app.post("/logout", (req, res) => {
 
 // -----------*Cut*------------------ //
 
-const port = 8181
+const PORT = 8181
 
-app.listen(port, () => {
+app.listen(PORT, () => {
 
-    console.log(`listen on port => ${port}`);
 
+    console.log(`Running on port: ${styleText("magenta", styleText("bold", `${PORT}`))} `)
+
+
+    console.log(`Open ${styleText("yellowBright", styleText("bold", `http://localhost:${PORT}`)
+    )} in your browser
+    `);
+
+    // console.log(styleText("bgYellowBright",
+    //     styleText("black", `Open http://localhost:${port} in your browser`)));
 })

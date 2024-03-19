@@ -1,4 +1,3 @@
-import { name } from "ejs";
 import { prisma } from "./PrismaDB.js";
 import jwt from "jsonwebtoken"
 
@@ -14,14 +13,14 @@ async function login(userName) {
 
 
     if (checkUser === null) {
-        return null
+        return "Wrong username"
     }
 
     const secret = process.env.JWT_TOKEN_SECRET
 
     const token = jwt.sign({
         data: { id: checkUser.id, username: checkUser.name }
-    }, secret)
+    }, secret, { expiresIn: "15m" })
 
     const databseUserName = checkUser.name
     const databseUserId = checkUser.id
