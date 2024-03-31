@@ -1,5 +1,5 @@
 import express from "express";
-import jsonwebtoken from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url"
 import path from "path"
@@ -17,6 +17,8 @@ const app = express()
 
 app.use(cookieParser())
 
+app.use(express.json());  // Built-in middleware for parsing JSON
+
 app.use(express.urlencoded({ extended: false }))
 
 
@@ -28,6 +30,10 @@ const __dirname = path.dirname(__filename)
 
 
 let name = "Guest User"
+
+const accessTokenSecret = process.env.JWT_TOKEN_SECRET
+const refreshTokenSecret = process.env.JWT_REFRESH_TOKEN_SECRET
+
 
 app.get("/", (req, res) => {
 
@@ -87,16 +93,22 @@ app.post("/login", async (req, res) => {
 
     refreshTokens.push(refreshToken)
 
+    console.log(refreshTokens)
     /* Tokens <<-------------------- */
 
-    res.send({ user, accessToken })
+    res.send({ user, accessToken, refreshToken })
 
 
 })
 
+app.post("/json", (req, res) => {
+
+    console.log(req.body.key);
+    res.json("jSooooooooon")
+})
+
 
 app.post("/api/auth/refresh", (req, res) => {
-
     /**
      * 1- Check if the token avilable 
      * 2- Check if the token valid
@@ -106,11 +118,41 @@ app.post("/api/auth/refresh", (req, res) => {
 
     const refreshToken = req.body.token
 
+    console.log(refreshToken)
+
     if (!refreshToken) {
         return res.status(401).json("Not authanticated")
     }
 
+    if (!refreshTokens.includes(refreshToken)) {
+        return res.status(403).json("Refresh Token is Invalid")
+    }
 
+
+    jwt.verify(refreshToken, refreshTokenSecret, (error, user) => {
+        error && console.error(error)
+
+        // Remove the old refresh-token from the array
+        refreshTokens = refreshTokens.filter((token) => {
+            !token !== refreshToken
+        })
+
+        // Create new Access & Refresh tokens
+
+        const newAccessToken = generateAccessToken(user)
+
+        const newRefreshToken = generateRefreshToken(user)
+
+        refreshTokens.push(newRefreshToken)
+
+        res.status(200).json({
+
+            accessToken: newAccessToken,
+            refreshTokens: newRefreshToken
+
+        })
+
+    })
 
 
 })

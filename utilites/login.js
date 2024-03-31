@@ -1,8 +1,4 @@
 import { prisma } from "./PrismaDB.js";
-import jwt from "jsonwebtoken"
-import { generateAccessToken, generateRefreshToken } from "./generateTokens.js";
-
-
 
 async function login(userName) {
 
