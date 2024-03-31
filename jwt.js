@@ -9,6 +9,7 @@ import createNewUser from "./utilites/createNewUser.js"
 import login from "./utilites/login.js";
 import authMiddleware from "./utilites/AuthMidlleware.js"
 import { styleText } from "util"
+import { generateAccessToken, generateRefreshToken } from "./utilites/generateTokens.js";
 
 
 
@@ -57,6 +58,8 @@ app.post("/register", (req, res) => {
 
 })
 
+let refreshTokens = []
+
 
 app.post("/login", async (req, res) => {
 
@@ -76,7 +79,38 @@ app.post("/login", async (req, res) => {
 
     // res.redirect("/profile")
 
-    res.send(user)
+    /* Tokens -------------------->> */
+
+    const accessToken = generateAccessToken(user)
+
+    const refreshToken = generateRefreshToken(user)
+
+    refreshTokens.push(refreshToken)
+
+    /* Tokens <<-------------------- */
+
+    res.send({ user, accessToken })
+
+
+})
+
+
+app.post("/api/auth/refresh", (req, res) => {
+
+    /**
+     * 1- Check if the token avilable 
+     * 2- Check if the token valid
+     * 3- If it passes 1&2 
+     *    Generate new access token and refresh token
+     *  */
+
+    const refreshToken = req.body.token
+
+    if (!refreshToken) {
+        return res.status(401).json("Not authanticated")
+    }
+
+
 
 
 })

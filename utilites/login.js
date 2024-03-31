@@ -1,5 +1,8 @@
 import { prisma } from "./PrismaDB.js";
 import jwt from "jsonwebtoken"
+import { generateAccessToken, generateRefreshToken } from "./generateTokens.js";
+
+
 
 async function login(userName) {
 
@@ -16,19 +19,26 @@ async function login(userName) {
         return "Wrong username"
     }
 
-    const secret = process.env.JWT_TOKEN_SECRET
+    /* Tokens -------------------->> */
 
-    const token = jwt.sign({
-        data: { id: checkUser.id, username: checkUser.name }
-    }, secret, { expiresIn: "15m" })
+    // const accessToken = generateAccessToken(checkUser)
+
+    // const refreshToken = generateRefreshToken(checkUser)
+
+    // refreshTokens.push(refreshToken)
+
+    /* Tokens <<-------------------- */
+
 
     const databseUserName = checkUser.name
+
     const databseUserId = checkUser.id
 
     return {
         id: databseUserId,
         username: databseUserName,
-        token: token
+        // accessToken: accessToken,
+        // refreshToken: refreshToken
     }
 
 }
