@@ -15,6 +15,7 @@ function authMidlleware(req, res, next) {
             // const token = authToken.substring(7)
 
             const token = authHeaders.split(" ")[1]
+            console.log(token);
 
             const data = jwt.verify(token, process.env.JWT_TOKEN_SECRET, (err, data) => {
                 if (err) {
@@ -33,7 +34,7 @@ function authMidlleware(req, res, next) {
     } catch (error) {
 
         console.error(error);
-        
+
     }
 
 

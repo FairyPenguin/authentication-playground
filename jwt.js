@@ -77,7 +77,7 @@ app.post("/login", async (req, res) => {
 
     const user = await login(userName)
 
-    if (!user) {
+    if (!user || user === "Wrong username") {
         return res.status(442).json({ error: "Incorrect username" })
     }
 
@@ -86,6 +86,7 @@ app.post("/login", async (req, res) => {
     // res.redirect("/profile")
 
     /* Tokens -------------------->> */
+
 
     const accessToken = generateAccessToken(user)
 
@@ -96,8 +97,9 @@ app.post("/login", async (req, res) => {
     console.log(refreshTokens)
     /* Tokens <<-------------------- */
 
-    res.send({ user, accessToken, refreshToken })
 
+
+    res.send({ user, accessToken, refreshToken })
 
 })
 
@@ -157,6 +159,17 @@ app.post("/api/auth/refresh", (req, res) => {
 
 })
 
+app.post("/api/auth/logout", authMiddleware, (req, res) => {
+
+    const refreshToken = req.body.token
+    refreshTokens = refreshTokens.filter((token) => {
+        !token !== refreshToken
+    })
+
+    res.status(200).json("Logged out successfuly.")
+})
+
+
 
 app.get("/users", async (req, res) => {
 
@@ -200,11 +213,6 @@ app.get("/profile", (req, res) => {
 
 
 
-app.post("/logout", (req, res) => {
-
-    res.redirect("/")
-
-})
 
 
 // console.log("EL TOKEN", process.env.JWT_TOKEN_SECRET)
